@@ -1,0 +1,1 @@
+powershell -Command "Start-Process PowerShell %cd%/install.ps1 -verb RunAs"
