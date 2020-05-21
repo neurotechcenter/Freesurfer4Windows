@@ -44,13 +44,15 @@ function Download-File
 	}
 }
 
-Start-Transcript -Path log.txt -Append
+
 $global:RegRunKey ="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
-$global:restartKey = "Restart-And-Resume"
 $script = $myInvocation.MyCommand.Definition
+$scriptPath = Split-Path -parent $script
 $ErrorActionPreference = "Stop"
 $key = 'WSLFreesurferInstall'
-$file=$MyInvocation.MyCommand.Name
+Start-Transcript -Path $scriptPath/log.txt -Append
+
+
 
 $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 if(-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
@@ -75,11 +77,12 @@ if (Test-Key $global:RegRunKey $key) #remove automatic script call after reboot
 	Remove-Key $global:RegRunKey $key
 }
 
-Write-Host "Downloading and installing Ubuntu..."
 
+Write-Host "Checking for existing Ubuntu installation..."
 $ubpackage = Get-AppxPackage -Name "CanonicalGroupLimited.Ubuntu*"
 if($ubpackage -eq $null )
 {
+	Write-Host "Downloading and installing Ubuntu..."
 	Download-File -Source https://aka.ms/wsl-ubuntu-1804 -Target Ubuntu.appx
 	Add-AppxPackage .\Ubuntu.appx
 	#cleanup
@@ -101,15 +104,7 @@ if($checkInstall -eq "success")
 	Write-Host "Ubuntu successfully installed!"
 }
 
-Write-Host "Installing necessary packages ...."
-bash -c "sudo apt-get update"
-bash -c "sudo apt-get install wslu"
 
-
-
-
-Write-Host "Downloading Freesurfer..."
-Download-File https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.1.0/freesurfer-linux-centos8_x86_64-7.1.0.tar.gz -Target freesurfer.tar.gz
 #select target dir for freesurfer
 #configure paths
 $fspath = Read-Host "Choose Freesurfer Path (default is C:/freesurfer)"
@@ -122,26 +117,18 @@ if(-Not (Test-Path $fspath))
 mkdir $fspath
 }
 
+$configScriptPath= $scriptPath+"\config_ub.sh"
 try
 {
 	$fspathUbuntu=wslpath -a $fspath
-	$fileubPath=wslpath -a (Resolve-Path freesurfer.tar.gz).Path
+	$fileubPath=wslpath -a $configScriptPath
 }
 catch
 {
 	$fspathUbuntu=To-WSLPath($fspath)
-	$fileubPath=To-WSLPath((Resolve-Path freesurfer.tar.gz).Path)
+	$fileubPath=To-WSLPath($configScriptPath)
 }
 
-bash -c "tar xvzf $fileubPath -C $fspathUbuntu"
-$fstestpath= $fspathUbuntu+"/freesurfer"
-#test freesurfer
-if(bash -c "export FREESURFER_HOME="+$fspathUbuntu+"/freesurfer 
-source $FREESURFER_HOME/SetUpFreeSurfer.sh" -eq 0)
-{
-Write-Host "Freesurfer and the WSL system have been installed successfully!"
-}
-else
-{
-Write-Error "Problem during script!"
-}
+bash -c "$fileubPath $fspathUbuntu"
+Write-Host "Press any key to continue..."
+$Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
