@@ -130,5 +130,16 @@ catch
 }
 
 bash -c "$fileubPath $fspathUbuntu"
+
+
+#Download Winserver for Windows
+Write-Host "Downloading most recent VcXsrv..."
+Download-File -Source https://sourceforge.net/projects/vcxsrv/files/latest/download -Target VcXsrv.exe
+
+Write-Host "Installing VcXsrv..."
+VcXsrv.exe /verysilent /norestart
+Write-Host "Installation of VcXserv done!."
+
+rm VcXsrv.exe
 Write-Host "Press any key to continue..."
 $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
