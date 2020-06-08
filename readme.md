@@ -5,7 +5,7 @@ The automated script will perform multiple operations.
 - Enabling the WSL Subsystem on Windows 10
 - Download and Install of a Ubuntu Distribution
 - Download and Configuration Freesurfer to run on Windows
-- Installing and enabling [XLaunch] (https://sourceforge.net/projects/vcxsrv/) to enable Freeview
+- Installing and enabling [XLaunch](https://sourceforge.net/projects/vcxsrv/) to enable Freeview
 
 
 # Easy Installation
