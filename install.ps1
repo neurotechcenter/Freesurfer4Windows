@@ -50,6 +50,7 @@ $script = $myInvocation.MyCommand.Definition
 $scriptPath = Split-Path -parent $script
 $ErrorActionPreference = "Stop"
 $key = 'WSLFreesurferInstall'
+cd $scriptPath
 Start-Transcript -Path $scriptPath/log.txt -Append
 
 
@@ -137,9 +138,9 @@ Write-Host "Downloading most recent VcXsrv..."
 Download-File -Source https://sourceforge.net/projects/vcxsrv/files/latest/download -Target VcXsrv.exe
 
 Write-Host "Installing VcXsrv..."
-VcXsrv.exe /verysilent /norestart
+Start-Process "./VcXsrv.exe" -argumentlist "/S" -wait
 Write-Host "Installation of VcXserv done!."
 
 rm VcXsrv.exe
-Write-Host "Press any key to continue..."
+Write-Host "Installation finished without issues! "
 $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
