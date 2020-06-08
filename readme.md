@@ -7,3 +7,15 @@ The automated script will perform multiple operations.
 - Download and Configuration Freesurfer to run on Windows
 - Installing and enabling [XLaunch] (https://sourceforge.net/projects/vcxsrv/) to enable Freeview
 
+
+#Easy Installation
+
+Before Installation you will have to allow execution of powershell scripts:
+-Open Powershell as administrator
+  -Type  Powershell into the Windows 10 Searchbar
+  -Rightclick Windows Powershell and Run as Administrator
+  
+-Run 'Set-ExecutionPolicy unrestricted'
+
+You are now able to run the Freesurfer4Windows Installation script. Run the runme.bat and follow the instructions.
+
