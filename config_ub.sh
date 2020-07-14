@@ -1,7 +1,7 @@
 
 echo "Downloading necessary dependencies..."
 sudo apt-get update
-sudo apt-get install wslu libglu1-mesa libgomp1
+sudo apt-get install wslu libglu1-mesa libgomp1 tcsh
 echo 'Checking for Freesurfer in Directory'
 echo $1
 if [ -d $1 ] 
@@ -15,7 +15,7 @@ then
 	echo "Downloading freesurfer..."
 	curl.exe -L -o freesurfer.tar.gz https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.1.0/freesurfer-linux-centos8_x86_64-7.1.0.tar.gz
 	echo "extracting freesurfer into target directory..."
-	tar xvzf freesurfer.tar.gz -C $1
+	sudo tar xvzf freesurfer.tar.gz -C $1
 	rm freesurfer.tar.gz
 fi
 
