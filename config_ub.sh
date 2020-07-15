@@ -1,7 +1,7 @@
 
 echo "Downloading necessary dependencies..."
 sudo apt-get update
-sudo apt-get install wslu libglu1-mesa libgomp1 tcsh
+sudo apt-get install wslu libglu1-mesa libgomp1 tcsh dos2unix
 echo 'Checking for Freesurfer in Directory'
 echo $1
 if [ -d $1 ] 
