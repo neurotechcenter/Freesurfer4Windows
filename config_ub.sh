@@ -30,7 +30,7 @@ echo ''
 case $yn in
 	'y'|'')
 		touch ~/.run_fs
-		echo "export FREESURFER_HOME="$1"/freesurfer/" > ~/.run_fs
+		echo "export FREESURFER_HOME="$1"/freesurfer" > ~/.run_fs
 		echo 'source $FREESURFER_HOME/SetUpFreeSurfer.sh' >> ~/.run_fs
 		echo 'export DISPLAY=:0' >> ~/.run_fs
 		chmod +x ~/.run_fs
