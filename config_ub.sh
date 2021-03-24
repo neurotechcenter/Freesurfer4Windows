@@ -10,7 +10,7 @@ then
 fi
 echo ''
 
-if [ "$yn" != 'y' ] 
+if [ "$yn" != 'n' ] 
 then
 	echo "Downloading freesurfer..."
 	curl.exe -L -o freesurfer.tar.gz https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.1.0/freesurfer-linux-centos8_x86_64-7.1.0.tar.gz
