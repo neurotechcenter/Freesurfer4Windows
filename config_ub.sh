@@ -10,12 +10,12 @@ then
 fi
 echo ''
 
-if [ "$yn" != 'y' ] 
+if [ "$yn" == 'y' ] 
 then
 	echo "Downloading freesurfer..."
 	sudo curl -L -o freesurfer.tar.gz https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.1.0/freesurfer-linux-centos8_x86_64-7.1.0.tar.gz
 	echo "extracting freesurfer into target directory..."
-	sudo tar xvzf freesurfer.tar.gz -C $1
+	sudo tar xzf freesurfer.tar.gz -C $1
 	rm freesurfer.tar.gz
 fi
 
