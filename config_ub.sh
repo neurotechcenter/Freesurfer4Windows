@@ -4,9 +4,9 @@ sudo apt-get update
 sudo apt-get install wslu libglu1-mesa libgomp1 tcsh dos2unix curl
 echo 'Checking for Freesurfer in Directory'
 echo $1
-if [ -d $1 ] 
+if [ "$(ls -A $1)" ];
 then
-	read -n 1 -p "Freesurfer directory already exists, do you want to keep it? (y/n) (default: n) " yn
+	read -n 1 -p "Freesurfer directory is empty, do you want to download Freesurfer? (y/n) (default: n) " yn
 fi
 echo ''
 
