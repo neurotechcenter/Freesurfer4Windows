@@ -4,13 +4,15 @@ sudo apt-get update
 sudo apt-get install wslu libglu1-mesa libgomp1 tcsh dos2unix curl
 echo 'Checking for Freesurfer in Directory'
 echo $1
-if [ "$(ls -A $1)" ];
+if [ "$(ls -A $1)" ]
 then
-	read -n 1 -p "Freesurfer directory is empty, do you want to download Freesurfer? (y/n) (default: n) " yn
+	echo "Keeping current freesurfer installation!"
+else
+	read -n 1 -p "Freesurfer directory is empty, do you want to download Freesurfer? (y/n) (default: y) " yn
 fi
 echo ''
 
-if [ "$yn" == 'y' ] 
+if [ "$yn" != 'n' ] 
 then
 	echo "Downloading freesurfer..."
 	sudo curl -L -o freesurfer.tar.gz https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.1.0/freesurfer-linux-centos8_x86_64-7.1.0.tar.gz
