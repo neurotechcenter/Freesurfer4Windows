@@ -10,14 +10,7 @@ The automated script will perform multiple operations.
 
 # Installation
 
-Before installation you will have to allow execution of PowerShell scripts:
-- Open Powershell as administrator
-  - Type  Powershell into the Windows 10 Searchbar
-  - Rightclick Windows Powershell and Run as Administrator
-  
-- Run `Set-ExecutionPolicy unrestricted` and accept the change in execution policy (y)
-
-You are now able to run the Freesurfer4Windows Installation script. Run runme.bat and follow the instructions.
+To run the Freesurfer4Windows Installation script simply start the runme.bat and follow the instructions.
 
 After the installation has finished, you will need to obtain a [Freesurfer license](https://surfer.nmr.mgh.harvard.edu/fswiki/License). 
 
