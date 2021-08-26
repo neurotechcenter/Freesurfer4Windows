@@ -130,7 +130,7 @@ catch
 	$fileubPath=To-WSLPath($configScriptPath)
 }
 
-bash -c "$fileubPath $fspathUbuntu"
+bash -c "'$fileubPath' '$fspathUbuntu'"
 
 
 #Download Winserver for Windows
