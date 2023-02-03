@@ -84,7 +84,7 @@ $ubpackage = Get-AppxPackage -Name "CanonicalGroupLimited.Ubuntu*"
 if($ubpackage -eq $null )
 {
 	Write-Host "Downloading and installing Ubuntu..."
-	Download-File -Source https://aka.ms/wsl-ubuntu-1804 -Target Ubuntu.appx
+	Download-File -Source https://aka.ms/wslubuntu2004 -Target Ubuntu.appx
 	wsl --set-default-version 1
 	Add-AppxPackage .\Ubuntu.appx
 	#cleanup
