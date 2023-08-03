@@ -83,7 +83,7 @@ Write-Host "Checking for existing Ubuntu installation..."
 $ubpackage = Get-AppxPackage -Name "CanonicalGroupLimited.Ubuntu*"
 if($ubpackage -eq $null )
 {
-	Write-Host "Downloading and installing Ubuntu..."
+	Write-Host "Downloading and installing Ubuntu 20.04..."
 	Download-File -Source https://aka.ms/wslubuntu2004 -Target Ubuntu.appx
 	wsl --set-default-version 1
 	Add-AppxPackage .\Ubuntu.appx
@@ -143,5 +143,6 @@ Start-Process "./VcXsrv.exe" -argumentlist "/S" -wait
 Write-Host "Installation of VcXserv done!."
 
 rm VcXsrv.exe
-Write-Host "Installation finished without issues! "
+Write-Host "Installation finished without issues! Please close this window. Do not forget the freesurfer license!"
 $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+
