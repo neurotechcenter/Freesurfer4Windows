@@ -85,7 +85,9 @@ if($ubpackage -eq $null )
 {
 	Write-Host "Downloading and installing Ubuntu 20.04..."
 	Download-File -Source https://aka.ms/wslubuntu2004 -Target Ubuntu.appx
-	wsl --set-default-version 1
+	wsl --set-default-version 2 # James changed to wsl2
+    wsl --set-version Ubuntu 2
+    wsl --manage Ubuntu --set-sparse true # James added to try to prevent wsl2 from eating all available hard drive space
 	Add-AppxPackage .\Ubuntu.appx
 	#cleanup
 	rm Ubuntu.appx
