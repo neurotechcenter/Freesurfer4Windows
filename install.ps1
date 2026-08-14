@@ -108,6 +108,7 @@ if($ubpackage -eq $null )
 	Write-Host "Downloading and installing Ubuntu 18.04..."
 	Download-File -Source $ubuntuAppxUrl -Target Ubuntu.appx
 	wsl --set-default-version 2 # James changed to wsl2
+	Write-Host "(Any WSL command-line messages above can be ignored - installing Ubuntu now. An Ubuntu window will open shortly; please wait for it.)"
 	Add-AppxPackage .\Ubuntu.appx
 	#cleanup
 	rm Ubuntu.appx
