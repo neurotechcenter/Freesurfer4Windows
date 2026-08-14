@@ -81,33 +81,34 @@ if (Test-Key $global:RegRunKey $key) #remove automatic script call after reboot
 
 Write-Host "Checking for existing Ubuntu installation..."
 # Freesurfer 7.2.0 (downloaded by config_ub.sh) only ships an official Ubuntu18 build
-# (freesurfer-linux-ubuntu18_amd64-7.2.0.tar.gz). Installing whatever Ubuntu happens to be
-# the current WSL default (24.04+ as of 2026) risks library/glibc mismatches, so pin to the
-# matching LTS release instead. Bump this if config_ub.sh is ever updated to a newer Freesurfer
-# build (e.g. Freesurfer 7.4.1 officially supports Ubuntu 22 - see the Freesurfer wiki's
-# FS7_wsl_ubuntu page).
-$ubuntuDistro = "Ubuntu-18.04"
+# (freesurfer-linux-ubuntu18_amd64-7.2.0.tar.gz). 'wsl --install -d <name>' can no longer pin a
+# version though - as of 2026 'wsl --list --online' only lists the generic, rolling "Ubuntu"
+# (currently 24.04+), not versioned entries like "Ubuntu-18.04"/"Ubuntu-20.04"/"Ubuntu-22.04".
+# So instead we download the Ubuntu 18.04 appx directly (the same method this script used pre-2023,
+# just pointed at 18.04 instead of 20.04) to get the version Freesurfer 7.2.0 actually matches.
+# Note: this appx registers its WSL distro simply as "Ubuntu", not "Ubuntu-18.04".
+# If config_ub.sh is ever bumped to a newer Freesurfer build (e.g. 7.4.1, which officially
+# supports Ubuntu 22 - see the Freesurfer wiki's FS7_wsl_ubuntu page), change $ubuntuAppxUrl
+# below to match (e.g. https://aka.ms/wslubuntu2204) and update config_ub.sh together.
+$ubuntuAppxUrl = "https://aka.ms/wsl-ubuntu-1804"
+$ubuntuDistro = "Ubuntu"
 $ubpackage = Get-AppxPackage -Name "CanonicalGroupLimited.Ubuntu*"
 if($ubpackage -eq $null )
 {
-	Write-Host "Installing $ubuntuDistro via 'wsl --install -d $ubuntuDistro'..."
-	wsl --install -d $ubuntuDistro
-	Write-Host "Waiting for the Ubuntu package to register..."
-	$retries = 0
-	while ($ubpackage -eq $null -and $retries -lt 30)
-	{
-		Start-Sleep -Seconds 2
-		$ubpackage = Get-AppxPackage -Name "CanonicalGroupLimited.Ubuntu*"
-		$retries++
-	}
-	if ($ubpackage -eq $null)
-	{
-		Write-Error "$ubuntuDistro did not register after 'wsl --install -d $ubuntuDistro'. Run 'wsl --list --online' to see the currently available distro names, install $ubuntuDistro manually, then re-run this script."
-		Exit
-	}
+	Write-Host "Downloading and installing Ubuntu 18.04..."
+	Download-File -Source $ubuntuAppxUrl -Target Ubuntu.appx
 	wsl --set-default-version 2 # James changed to wsl2
     wsl --set-version $ubuntuDistro 2
     wsl --manage $ubuntuDistro --set-sparse true # James added to try to prevent wsl2 from eating all available hard drive space
+	Add-AppxPackage .\Ubuntu.appx
+	#cleanup
+	rm Ubuntu.appx
+	$ubpackage = Get-AppxPackage -Name "CanonicalGroupLimited.Ubuntu*"
+	if ($ubpackage -eq $null)
+	{
+		Write-Error "Ubuntu did not install from '$ubuntuAppxUrl'. Download and install it manually, then re-run this script."
+		Exit
+	}
 	Write-Host "Initializing Ubuntu Installation... Please close the ubuntu window after initialization is done!"
 	$ubapp=($ubpackage | Get-AppxPackageManifest).Package.Applications.Application.Id
 	Start-Process $ubapp -Wait -verb RunAs
