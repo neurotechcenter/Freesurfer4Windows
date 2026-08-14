@@ -80,18 +80,34 @@ if (Test-Key $global:RegRunKey $key) #remove automatic script call after reboot
 
 
 Write-Host "Checking for existing Ubuntu installation..."
+# Freesurfer 7.2.0 (downloaded by config_ub.sh) only ships an official Ubuntu18 build
+# (freesurfer-linux-ubuntu18_amd64-7.2.0.tar.gz). Installing whatever Ubuntu happens to be
+# the current WSL default (24.04+ as of 2026) risks library/glibc mismatches, so pin to the
+# matching LTS release instead. Bump this if config_ub.sh is ever updated to a newer Freesurfer
+# build (e.g. Freesurfer 7.4.1 officially supports Ubuntu 22 - see the Freesurfer wiki's
+# FS7_wsl_ubuntu page).
+$ubuntuDistro = "Ubuntu-18.04"
 $ubpackage = Get-AppxPackage -Name "CanonicalGroupLimited.Ubuntu*"
 if($ubpackage -eq $null )
 {
-	Write-Host "Downloading and installing Ubuntu 20.04..."
-	Download-File -Source https://aka.ms/wslubuntu2004 -Target Ubuntu.appx
+	Write-Host "Installing $ubuntuDistro via 'wsl --install -d $ubuntuDistro'..."
+	wsl --install -d $ubuntuDistro
+	Write-Host "Waiting for the Ubuntu package to register..."
+	$retries = 0
+	while ($ubpackage -eq $null -and $retries -lt 30)
+	{
+		Start-Sleep -Seconds 2
+		$ubpackage = Get-AppxPackage -Name "CanonicalGroupLimited.Ubuntu*"
+		$retries++
+	}
+	if ($ubpackage -eq $null)
+	{
+		Write-Error "$ubuntuDistro did not register after 'wsl --install -d $ubuntuDistro'. Run 'wsl --list --online' to see the currently available distro names, install $ubuntuDistro manually, then re-run this script."
+		Exit
+	}
 	wsl --set-default-version 2 # James changed to wsl2
-    wsl --set-version Ubuntu 2
-    wsl --manage Ubuntu --set-sparse true # James added to try to prevent wsl2 from eating all available hard drive space
-	Add-AppxPackage .\Ubuntu.appx
-	#cleanup
-	rm Ubuntu.appx
-	$ubpackage = Get-AppxPackage -Name "CanonicalGroupLimited.Ubuntu*"
+    wsl --set-version $ubuntuDistro 2
+    wsl --manage $ubuntuDistro --set-sparse true # James added to try to prevent wsl2 from eating all available hard drive space
 	Write-Host "Initializing Ubuntu Installation... Please close the ubuntu window after initialization is done!"
 	$ubapp=($ubpackage | Get-AppxPackageManifest).Package.Applications.Application.Id
 	Start-Process $ubapp -Wait -verb RunAs
