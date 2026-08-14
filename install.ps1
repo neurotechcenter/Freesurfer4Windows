@@ -63,13 +63,23 @@ if(-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Admi
 }
 
 $featureInfo = Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+# WSL2 also needs the Virtual Machine Platform feature. 'wsl --install' would normally enable this
+# automatically, but this script installs Ubuntu manually (see below), so it has to be enabled here too.
+$vmFeatureInfo = Get-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform
 
 
-if($featureInfo.State -ne "Enabled")
+if($featureInfo.State -ne "Enabled" -or $vmFeatureInfo.State -ne "Enabled")
 {	$restartcmd="powershell -Command Start-Process PowerShell $script -verb RunAs"
 	Set-Key $global:RegRunKey $key $restartcmd  #automatically open script after reboot
-	Write-Host "Enabling WSL... This will require a restart, Script will continue automatically!"
-	Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+	Write-Host "Enabling WSL and Virtual Machine Platform... This will require a restart, Script will continue automatically!"
+	if($featureInfo.State -ne "Enabled")
+	{
+		Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+	}
+	if($vmFeatureInfo.State -ne "Enabled")
+	{
+		Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform
+	}
 	Exit
 }
 
@@ -98,8 +108,7 @@ if($ubpackage -eq $null )
 	Write-Host "Downloading and installing Ubuntu 18.04..."
 	Download-File -Source $ubuntuAppxUrl -Target Ubuntu.appx
 	wsl --set-default-version 2 # James changed to wsl2
-    wsl --set-version $ubuntuDistro 2
-    wsl --manage $ubuntuDistro --set-sparse true # James added to try to prevent wsl2 from eating all available hard drive space
+	Write-Host "(Any WSL command-line messages above can be ignored - installing Ubuntu now. An Ubuntu window will open shortly; please wait for it.)"
 	Add-AppxPackage .\Ubuntu.appx
 	#cleanup
 	rm Ubuntu.appx
@@ -109,9 +118,26 @@ if($ubpackage -eq $null )
 		Write-Error "Ubuntu did not install from '$ubuntuAppxUrl'. Download and install it manually, then re-run this script."
 		Exit
 	}
-	Write-Host "Initializing Ubuntu Installation... Please close the ubuntu window after initialization is done!"
+	Write-Host ""
+	Write-Host "A new Ubuntu console window is about to open to finish setting up Ubuntu. In that window:"
+	Write-Host "  1. Wait for it to finish unpacking (can take a minute or two)."
+	Write-Host "  2. When prompted, create a UNIX username and password for Ubuntu - this is separate"
+	Write-Host "     from your Windows login, can be anything, and the password won't show as you type."
+	Write-Host "  3. Once you see a normal prompt like 'username@computername:~$', setup is done -"
+	Write-Host "     close that Ubuntu window now. This installer is waiting for it to close and will"
+	Write-Host "     continue automatically once you do."
+	Write-Host ""
 	$ubapp=($ubpackage | Get-AppxPackageManifest).Package.Applications.Application.Id
 	Start-Process $ubapp -Wait -verb RunAs
+
+	# The distro only registers with WSL once this first-launch initialization completes, so
+	# --set-version/--manage (which target it by name) have to run after Start-Process, not before.
+	wsl --set-version $ubuntuDistro 2
+	wsl --manage $ubuntuDistro --set-sparse true 2>&1 | Out-Null # James added to try to prevent wsl2 from eating all available hard drive space
+	if ($LASTEXITCODE -ne 0)
+	{
+		Write-Host "Note: 'wsl --manage --set-sparse' isn't supported by this system's WSL version - skipping (this only affects disk-space usage, not Freesurfer). Run 'wsl --update' for a newer WSL if you want it."
+	}
 }
 else
 {
