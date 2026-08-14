@@ -117,7 +117,15 @@ if($ubpackage -eq $null )
 		Write-Error "Ubuntu did not install from '$ubuntuAppxUrl'. Download and install it manually, then re-run this script."
 		Exit
 	}
-	Write-Host "Initializing Ubuntu Installation... Please close the ubuntu window after initialization is done!"
+	Write-Host ""
+	Write-Host "A new Ubuntu console window is about to open to finish setting up Ubuntu. In that window:"
+	Write-Host "  1. Wait for it to finish unpacking (can take a minute or two)."
+	Write-Host "  2. When prompted, create a UNIX username and password for Ubuntu - this is separate"
+	Write-Host "     from your Windows login, can be anything, and the password won't show as you type."
+	Write-Host "  3. Once you see a normal prompt like 'username@computername:~$', setup is done -"
+	Write-Host "     close that Ubuntu window now. This installer is waiting for it to close and will"
+	Write-Host "     continue automatically once you do."
+	Write-Host ""
 	$ubapp=($ubpackage | Get-AppxPackageManifest).Package.Applications.Application.Id
 	Start-Process $ubapp -Wait -verb RunAs
 
